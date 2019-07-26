@@ -1,0 +1,54 @@
+import ParseDriver from './Storage/ParseDriver';
+import GameRepository from './Model/GameState';
+
+it('ParseDriver: connect', async () => {
+    let driver = new ParseDriver({
+        appId: 'myAppId',
+        masterKey: 'myMasterKey',
+        serverURL: 'http://localhost:1337/parse',
+        classes: [{className: 'GameState'}]
+    });
+
+    driver.connect();
+
+    await driver.testConnection().then(res => {
+        expect(res).toStrictEqual(true);
+    })
+});
+
+
+it('ParseDriver: save', async () => {
+    let driver = new ParseDriver({
+        appId: 'myAppId',
+        masterKey: 'myMasterKey',
+        serverURL: 'http://localhost:1337/parse',
+        classes: [{className: 'GameState'}]
+    });
+    driver.connect();
+
+    await driver.save({key: 'key'}, 'GameState')
+        .then((value) => driver.get(value.id, 'GameState'))
+        .then((value) => driver.delete(value.objectId, 'GameState'))
+        .catch((Error) => {console.log(Error); expect(false)})
+});
+
+it('ParseDriver: update', async () => {
+    let driver = new ParseDriver({
+        appId: 'myAppId',
+        masterKey: 'myMasterKey',
+        serverURL: 'http://localhost:1337/parse',
+        classes: [{className: 'GameState'}]
+    });
+    driver.connect();
+
+    await driver.save({key: 'key'}, 'GameState')
+        .then((value) => driver.get(value.id, 'GameState'))
+        .then((value) => driver.update(value.objectId, {objectId: value.objectId, key: 'key1'}, 'GameState'))
+        .then((value) => driver.get(value.id, 'GameState'))
+        .then(value => {
+            expect(value.key).toBe('key1');
+            return value.objectId
+        })
+        .then((id) => driver.delete(id, 'GameState'))
+        .catch((Error) => {console.log(Error); expect(false)})
+});
