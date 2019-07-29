@@ -113,6 +113,10 @@ export default class Game {
         return this.state.rules.requiredAssignees(this.state.game.totalMissions);
     }
 
+    get leader(){
+        return this.getPlayerByIdx(this.round.leader);
+    }
+
     getPlayerByIdx(playerIdx) {
         return this.game.players.map(p => p.id)[playerIdx];
     }
@@ -121,10 +125,16 @@ export default class Game {
         return this.game.players.findIndex(p => p.id === playerId);
     }
 
+    getImageForPlayer(playerId) {
+        let role = this.getRole(playerId).toLowerCase();
+        let idx = this.getPlayerIdxById(playerId) % (role === 'axis' ? 4 : 6);
+        return role + idx;
+    }
+
     getRole(playerId) {
         const idx = this.game.players.map(p => p.id).indexOf(playerId);
         const role = this.round.roles[idx];
-        return role === ResistanceRules.AXIS ? 'Infiltrate' : 'Allies';
+        return role === ResistanceRules.AXIS ? 'Axis' : 'Ally';
     }
 
     transition(t, mutation, eventParams) {
@@ -147,8 +157,15 @@ export default class Game {
         }
     }
 
-    checkIsLeader(playerId) {
+    isLeader(playerId) {
         if (this.game.players.findIndex(p => p.id === playerId) !== this.round.leader) {
+            return false;
+        }
+        return true;
+    }
+
+    isLeaderOrError(playerId) {
+        if (!this.isLeader(playerId)) {
             this.triggerEvent('error', ['Only leader can call this action']);
             return false;
         }
@@ -168,7 +185,7 @@ export default class Game {
     tryDeal(playerId) {
         console.log("[tryDeal]", playerId);
         if (!this.checkCurrentState('init')) return;
-        if (!this.checkIsLeader(playerId)) return;
+        if (!this.isLeaderOrError(playerId)) return;
 
         this.deal();
         console.log("[tryDeal]", "success");
@@ -183,7 +200,7 @@ export default class Game {
     trySelectAssignees(playerId, assignees) {
         console.log("[trySelectAssignees]", playerId, assignees);
         if (!this.checkCurrentState('build_team')) return;
-        if (!this.checkIsLeader(playerId)) return;
+        if (!this.isLeaderOrError(playerId)) return;
 
         let {success, code, details} = this.rules.validateAssignees(assignees, this.currentMission);
         if (!success) {
@@ -233,7 +250,7 @@ export default class Game {
     tryEvalVotes(playerId) {
         console.log("[tryEvalVotes]", playerId);
         if (!this.checkCurrentState('eval_votes')) return;
-        if (!this.checkIsLeader(playerId)) return;
+        if (!this.isLeaderOrError(playerId)) return;
 
         //1: success, 0: fail, -1: max fails
         let result = this.rules.evalVotes(Object.values(this.round.votes), this.round.failedAttempts);
@@ -307,7 +324,7 @@ export default class Game {
     tryEvalVotesMission(playerId) {
         console.log("[tryEvalVotesMission]", playerId);
         if (!this.checkCurrentState('eval_mission')) return;
-        if (!this.checkIsLeader(playerId)) return;
+        if (!this.isLeaderOrError(playerId)) return;
 
         let result = this.rules.evalVotesMission(Object.values(this.round.mission));
         if (-1 > result > 1) {
@@ -322,9 +339,9 @@ export default class Game {
     updateMissionStatus(success) {
         this.state.game.round.success = success;
         this.state.game.totalMissions++;
-        this.state.game.missions.push(this.round);
+        this.state.game.missions.push(this.state.game.round);
         if (this.rules.isNextMission(this.state.game.missions)) {
-            this.transition("next_mission", () => this.nextMission())
+            this.transition("next_mission", () => this.nextMission(), [success, Object.values(this.state.game.round.mission)])
         } else {
             this.transition("finish", () => this.finish(), [this.rules.getWinners(this.state.game.missions, this.players), this.players]);
         }
@@ -349,7 +366,7 @@ export default class Game {
     tryRematch(playerId) {
         console.log("[tryRematch]", playerId);
         if (!this.checkCurrentState('finish')) return;
-        if (!this.checkIsLeader(playerId)) return;
+        if (!this.isLeaderOrError(playerId)) return;
 
         let rematch = () => this.state.game = this.newGame(this.players, this.rules);
         this.transition('rematch', rematch);
@@ -365,6 +382,7 @@ export default class Game {
     }
 
     nextRound() {
+        console.log("next round")
         return {
             leader: this.rules.setLeader(this.players.length, this.round.leader),
             roles: this.roles,
@@ -383,6 +401,7 @@ export default class Game {
     }
 
     newGame(players, rules) {
+        console.log("new game")
         return {
             players: players,
             totalMissions: 0,

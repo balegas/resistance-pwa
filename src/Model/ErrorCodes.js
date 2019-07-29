@@ -17,11 +17,11 @@ export function msg_for_error(codeOrError) {
         case ERROR_NOT_CORRECT_ASSIGNEES:
             return "Number of assignees is wrong.";
         case ERROR_INVALID_PLAYER:
-            return `Some Player Id is invalid. ${arguments[1]}`;
+            return `Some Player Id is invalid: ${arguments[1]}`;
         case INVALID_OPERATION:
-            return `Invalid operation. ${arguments[1]}`;
+            return `Invalid operation: ${arguments[1]}`;
         case ERROR_PLAYER_ALREADY_VOTED:
-            return `Player already voted. ${arguments[1]}`;
+            return `Player already voted.`;
         default:
             return `Error: ${codeOrError}`
     }

@@ -19,6 +19,7 @@ export default class ResistanceRules {
     }
 
     setLeader(numPlayers, lastLeader) {
+        console.log("set leader", numPlayers, lastLeader)
         if (!lastLeader) {
             return Math.floor(Math.random() * numPlayers);
         }

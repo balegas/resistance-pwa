@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import GameMenu from './GameMenu'
 import Game from './Game'
 import GameDebug from './GameDebug'
@@ -7,6 +6,11 @@ import GameRepository, {GAME_OBJ_TYPE} from "../Model/GameRepository";
 import BasicPrincipal from "../Model/BasicPrincipal";
 import {msg_for_error} from "../Model/ErrorCodes"
 import {withSnackbar} from 'notistack';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 
 class Main extends Component {
 
@@ -58,8 +62,8 @@ class Main extends Component {
             const event = {event: 'all_votes_mission', type: 'global', params: {}};
             this.updateState(event)
         },
-        'next_mission': () => {
-            const event = {event: 'next_mission', type: 'global', params: {}};
+        'next_mission': ({success}) => {
+            const event = {event: 'next_mission', type: 'global', params: {success}};
             this.updateState(event)
         },
         'finish': () => {
@@ -72,6 +76,7 @@ class Main extends Component {
         },
 
         'error': (ErrorCode, Params) => {
+            this.playEvent({event: msg_for_error(ErrorCode, Params)});
             console.log(msg_for_error(ErrorCode, Params));
         }
     };
@@ -114,9 +119,9 @@ class Main extends Component {
         super(props);
         this.state = {
             gameRepository: new GameRepository({
-                appId: 'myAppId',
-                masterKey: 'myMasterKey',
-                serverURL: 'http://localhost:1337/parse',
+                appId: process.env.APP_ID || 'resistance-server',
+                masterKey: process.env.MASTER_KEY || 'masterKey',
+                serverURL: process.env.SERVER_URL || 'http://localhost:5000/parse',
                 classes: [{className: GAME_OBJ_TYPE}]
             }),
             eventCount: 0,
@@ -124,7 +129,8 @@ class Main extends Component {
             playerId: 'player1',
             gameId: 'wTAvLNbpMc',
             playersIds: ['player1', 'player2', 'player3', 'player4', 'player5'],
-            open: true
+            open: true,
+            tab: 0
         };
     }
 
@@ -185,10 +191,10 @@ class Main extends Component {
         return (
             <div>
                 <GameDebug gameRepository={this.state.gameRepository}
-                      eventHandlers={this.eventHandlers}
-                      gameId={this.gameId}
-                      player={this.principal}
-                      players={this.playersIds}
+                           eventHandlers={this.eventHandlers}
+                           gameId={this.gameId}
+                           player={this.principal}
+                           players={this.playersIds}
                 ></GameDebug>
             </div>
         )
@@ -207,34 +213,50 @@ class Main extends Component {
         this.setState({open: false});
     };
 
+    handleChange = (event, newValue) => this.setState({tab: newValue});
+
+    a11yProps = (index) => ({
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+    });
+
+    TabPanel(props) {
+        const {children, value, index, ...other} = props;
+
+        return (
+            <Typography
+                component="div"
+                role="tabpanel"
+                hidden={value !== index}
+                id={`simple-tabpanel-${index}`}
+                aria-labelledby={`simple-tab-${index}`}
+                {...other}
+            >
+                <Box p={3}>{children}</Box>
+            </Typography>
+        );
+    }
+
     render() {
         return (
             <div>
-                <Router>
-                    <div>
-                        <nav>
-                            <ul>
-                                <li>
-                                    <Link to="/">Home</Link>
-                                </li>
-                                <li>
-                                    <Link to="/new/">Enter Game</Link>
-                                </li>
-                                <li>
-                                    <Link to="/Game/">Game</Link>
-                                </li>
-                                <li>
-                                    <Link to="/Debug/">Debug</Link>
-                                </li>
-                            </ul>
-                        </nav>
-
-                        <Route path="/" exact render={() => this.index()}/>
-                        <Route path="/new/" render={() => this.createGame()}/>
-                        <Route path="/game/" render={() => this.gamePanel()}/>
-                        <Route path="/debug/" render={() => this.debugPanel()}/>
-                    </div>
-                </Router>
+                <AppBar position="static">
+                    <Tabs value={this.state.tab} onChange={this.handleChange} aria-label="simple tabs example">
+                        <Tab label="Enter Game" {...this.a11yProps(0)} />
+                        <Tab label="Game" {...this.a11yProps(1)} />
+                        <Tab label="Debug" {...this.a11yProps(2)} />
+                        <Tab label="Instructions (coming soon)" {...this.a11yProps(2)} />
+                    </Tabs>
+                </AppBar>
+                <this.TabPanel value={this.state.tab} index={0}>
+                    {this.createGame()}
+                </this.TabPanel>
+                <this.TabPanel value={this.state.tab} index={1}>
+                    {this.gamePanel()}
+                </this.TabPanel>
+                <this.TabPanel value={this.state.tab} index={2}>
+                    {this.debugPanel()}
+                </this.TabPanel>
             </div>
         )
     }

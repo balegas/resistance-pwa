@@ -1,9 +1,6 @@
 import React, {Component} from "react";
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import PlayerActions from "./PlayerActions";
-import Board from "./Board";
-import MissionPanel from "./MissionPanel";
 
 const style = {
     root: {
@@ -96,9 +93,9 @@ export default class GameDebug extends Component {
                             style={style.paper}>{`Mission Votes: ${Object.keys(this.game.round.mission)}`}</Paper>
                     </Grid>
                 </Grid>
-                {/*<Grid item xs={12}>*/}
-                {/*    <Paper style={style.paper}>{`Dump: ${JSON.stringify(this.game)}`}</Paper>*/}
-                {/*</Grid>*/}
+                <Grid item xs={12}>
+                    <Paper style={style.paper}>{`Dump: ${JSON.stringify(this.game)}`}</Paper>
+                </Grid>
             </Grid>
 
         );

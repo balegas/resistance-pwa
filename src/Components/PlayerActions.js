@@ -1,29 +1,40 @@
 import React from 'react';
+import Box from '@material-ui/core/Box';
+import ButtonBase from '@material-ui/core/ButtonBase';
 import Button from '@material-ui/core/Button';
+import images from "res/images";
+import {withStyles} from "@material-ui/styles";
+import {CardElement} from "../Elements/CardElements";
 
 const style = {
-    backdropStyle: {
+
+    button: {
+        margin: 10
+    },
+
+    backdrop: {
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         backgroundColor: 'rgba(0,0,0,0.3)',
-        padding: 50
+        padding: 50,
+        zIndex: 999,
+        height: '100%'
+
     },
 
-    modalStyle: {
+    modal: {
         backgroundColor: '#fff',
         borderRadius: 5,
-        maxWidth: 500,
+        width: 600,
         minHeight: 300,
         margin: '0 auto',
-        padding: 30
+        padding: 30,
     }
-
 };
 
-
-export default class PlayerActions extends React.Component {
+class PlayerActions extends React.Component {
 
     constructor(props) {
         super(props);
@@ -70,6 +81,7 @@ export default class PlayerActions extends React.Component {
 
     vote = (vote) => {
         this.props.game.tryVote(this.playerId, vote);
+        this.toggleModal();
     };
 
     evalVotes = () => {
@@ -78,6 +90,7 @@ export default class PlayerActions extends React.Component {
 
     voteMission = (vote) => {
         this.props.game.tryVoteMission(this.playerId, vote);
+        this.toggleModal();
     };
 
     evalVotesMission = () => {
@@ -104,43 +117,59 @@ export default class PlayerActions extends React.Component {
             })
         };
         const buttons = [];
-        this.props.players.forEach(p => buttons.push((<Button
-            key={p}
-            color={this.state.assignees.includes(p) ? 'secondary' : 'primary'}
-            onClick={() => toggleAssignee(p)}>
-            {p}
-        </Button>)));
+        this.props.players.forEach(p => buttons.push((
+            <Button
+                key={p}
+                color={this.state.assignees.includes(p) ? 'secondary' : 'primary'}
+                onClick={() => toggleAssignee(p)}
+                style={style.button}
+                >
+                {CardElement(p, this.state.assignees.includes(p))}
+            </Button>)));
         return ({
-            action: () => this.selectAssignees(),
-            text: 'Select Assignees',
-            content: (<div>{buttons}</div>)
+            content: (
+                <Box>
+                    <Box>{buttons}</Box>
+                    <Box className="footer">
+                        <Button onClick={this.toggleModal}>Close</Button>
+                        <Button onClick={() => this.selectAssignees()}>{'Select Assignees'}</Button>
+                    </Box>
+                </Box>)
         })
     };
 
     voteAction = () => {
         return ({
             content:
-                (<div>
-                    <Button key={'vote_accept'} onClick={() => this.vote(true)}>Accept</Button>
-                    <Button key={'vote_reject'} onClick={() => this.vote(false)}>Reject</Button>
-                </div>)
+                (<Box>
+                    <ButtonBase key={'vote_accept'} style={style.card} onClick={() => this.vote(true)}>
+                        <img width={300} src={images.support} alt='accept'></img>
+                    </ButtonBase>
+                    <ButtonBase key={'vote_reject'} style={style.card} onClick={() => this.vote(false)}>
+                        <img width={300} src={images.reject} alt='reject'></img>
+                    </ButtonBase>
+                </Box>)
         })
     };
 
     voteMissionAction = () => {
         return ({
             content:
-                (<div>
-                    <Button key={'vote_mission_accept'} onClick={() => this.voteMission(true)}>Accept</Button>
-                    <Button key={'vote_mission_reject'} onClick={() => this.voteMission(false)}>Reject</Button>
-                </div>)
+                (<Box>
+                    <ButtonBase key={'vote_mission_accept'} style={style.card} onClick={() => this.voteMission(true)}>
+                        <img width={300} src={images.succeed} alt='accept'></img>
+                    </ButtonBase>
+                    <ButtonBase key={'vote_mission_reject'} style={style.card} onClick={() => this.voteMission(false)}>
+                        <img width={300} src={images.fail} alt='reject'></img>
+                    </ButtonBase>
+                </Box>)
         })
     };
 
     modals = {
         'select': this.selectAssigneesAction,
-        'vote' : this.voteAction,
-        'vote_mission' : this.voteMissionAction
+        'vote': this.voteAction,
+        'vote_mission': this.voteMissionAction
     };
 
     render() {
@@ -148,18 +177,28 @@ export default class PlayerActions extends React.Component {
             return (
                 <div>
                     <div>
-                        <Button onClick={this.deal}>Deal</Button>
-                        <Button onClick={this.showSelectAssignees}>Select Assignees</Button>
-                        <Button onClick={this.showVote}>Vote</Button>
-                        <Button onClick={this.evalVotes}>Evaluate Votes</Button>
-                        <Button onClick={this.showVoteMission}>Vote Mission</Button>
-                        <Button onClick={this.evalVotesMission}>Evaluate Mission</Button>
-                        <Button onClick={this.rematch}>Rematch</Button>
+                        <Button style={style.button} variant="contained" color="primary" m={1}
+                                onClick={this.deal}>Deal</Button>
+                        <Button style={style.button} variant="contained" color="primary"
+                                onClick={this.showSelectAssignees}>Select
+                            Assignees</Button>
+                        <Button style={style.button} variant="contained" color="primary"
+                                onClick={this.showVote}>Vote</Button>
+                        <Button style={style.button} variant="contained" color="primary" onClick={this.evalVotes}>Evaluate
+                            Votes</Button>
+                        <Button style={style.button} variant="contained" color="primary" onClick={this.showVoteMission}>Vote
+                            Mission</Button>
+                        <Button style={style.button} variant="contained" color="primary"
+                                onClick={this.evalVotesMission}>Evaluate
+                            Mission</Button>
+                        <Button style={style.button} variant="contained" color="primary"
+                                onClick={this.rematch}>Rematch</Button>
                     </div>
                     <GameModal
                         id={this.state.open}
                         onClose={this.toggleModal}
                         modals={this.modals}
+                        classes={this.props.classes}
                     >
                     </GameModal>
                 </div>
@@ -178,6 +217,7 @@ class GameModal extends React.Component {
     };
 
     render() {
+        const {classes} = this.props;
         if (!this.props.id) {
             return null;
         }
@@ -185,20 +225,14 @@ class GameModal extends React.Component {
         if (!action) {
             return (<div></div>);
         }
-        let actionButton = (undefined);
-        if (action.action) {
-            actionButton = (<button onClick={action.action}>{action.text}</button>);
-        }
         return (
-            <div className="backdrop" style={style.backdropStyle}>
-                <div className="modal" style={style.modalStyle}>
+            <div className={classes.backdrop} onClick={this.props.onClose}>
+                <div className={classes.modal} onClick={(event) => event.stopPropagation()}>
                     {action.content}
-                    <div className="footer">
-                        <button onClick={this.props.onClose}>Close</button>
-                        {actionButton}
-                    </div>
                 </div>
             </div>
         );
     }
 }
+
+export default withStyles(style, {withTheme: true})(PlayerActions);
