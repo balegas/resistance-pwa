@@ -1,11 +1,8 @@
 import React, {Component} from "react";
-import {withStyles} from '@material-ui/styles';
 import Box from "@material-ui/core/Box";
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import {CardElement} from '../Elements/CardElements'
-
-const style = {};
 
 class MissionPanel extends Component {
 
@@ -61,5 +58,5 @@ class MissionPanel extends Component {
     ;
 }
 
-export default withStyles(style)(MissionPanel);
+export default MissionPanel;
 

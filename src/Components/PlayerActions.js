@@ -5,12 +5,15 @@ import Button from '@material-ui/core/Button';
 import images from "res/images";
 import {withStyles} from "@material-ui/styles";
 import {CardElement} from "../Elements/CardElements";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import FaceIcon from '@material-ui/icons/Face';
+import ListItemText from "@material-ui/core/ListItemText";
+import Grid from '@material-ui/core/Grid';
 
 const style = {
-
-    button: {
-        margin: 10
-    },
 
     backdrop: {
         position: 'fixed',
@@ -40,8 +43,8 @@ class PlayerActions extends React.Component {
         super(props);
         this.state = {
             isOpen: false,
-            modalContent: undefined,
-            assignees: []
+            assignees: [],
+            drawer: false
         }
     }
 
@@ -123,7 +126,7 @@ class PlayerActions extends React.Component {
                 color={this.state.assignees.includes(p) ? 'secondary' : 'primary'}
                 onClick={() => toggleAssignee(p)}
                 style={style.button}
-                >
+            >
                 {CardElement(p, this.state.assignees.includes(p))}
             </Button>)));
         return ({
@@ -172,27 +175,69 @@ class PlayerActions extends React.Component {
         'vote_mission': this.voteMissionAction
     };
 
+    toggleDrawer = (open) => event => {
+        if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        this.setState({drawer: open});
+    };
+
+
+    actions = {
+        deal: {fun: this.deal, text: 'Deal', leader: true},
+        select: {fun: this.showSelectAssignees, text: 'Select Assignees', leader: true},
+        vote: {fun: this.showVote, text: 'Vote', leader: false},
+        finish_vote: {fun: this.evalVotes, text: 'Reveal Vote Results', leader: true},
+        mission: {fun: this.showVoteMission, text: 'Vote Mission', leader: false},
+        finish_mission: {fun: this.evalVotesMission, text: 'Reveal Mission result', leader: false},
+        rematch: {fun: this.rematch, text: 'Rematch', leader: false},
+    };
+
+    actionsPanel = () => (
+        <div
+            //className={}
+            role="presentation"
+            onClick={this.toggleDrawer(false)}
+            onKeyDown={this.toggleDrawer(false)}
+        >
+            <Grid container>
+                <Grid item xs={6}>
+                    <List>
+                        {Object.values(this.actions).map((action, idx) => (
+                            <ListItem button key={'action_' + idx} onClick={action.fun}>
+                                <ListItemIcon><FaceIcon/></ListItemIcon>
+                                <ListItemText primary={action.text}/>
+                            </ListItem>
+                        ))}
+                    </List>
+                </Grid>
+                <Grid item xs={6}>
+                    {this.renderPlayer()}
+                </Grid>
+            </Grid>
+        </div>);
+
+
+    renderPlayer = () => {
+        let isLeader = this.props.game.isLeader(this.props.player.id);
+        let playerImg = this.props.game.getImageForPlayer(this.props.player.id);
+        return (
+            <Box  display="flex"  alignItems="center" p={1} m={1}>
+                <Box p={1}>
+                    <img height={'300'} src={images[playerImg]} alt='Player Faction'></img>
+                </Box>
+                <Box p={1}>
+                    {isLeader && <img height={'300'} src={images.leader} alt='Leader'></img>}
+                </Box>
+            </Box>)
+    };
+
     render() {
         if (this.props.game) {
             return (
                 <div>
                     <div>
-                        <Button style={style.button} variant="contained" color="primary" m={1}
-                                onClick={this.deal}>Deal</Button>
-                        <Button style={style.button} variant="contained" color="primary"
-                                onClick={this.showSelectAssignees}>Select
-                            Assignees</Button>
-                        <Button style={style.button} variant="contained" color="primary"
-                                onClick={this.showVote}>Vote</Button>
-                        <Button style={style.button} variant="contained" color="primary" onClick={this.evalVotes}>Evaluate
-                            Votes</Button>
-                        <Button style={style.button} variant="contained" color="primary" onClick={this.showVoteMission}>Vote
-                            Mission</Button>
-                        <Button style={style.button} variant="contained" color="primary"
-                                onClick={this.evalVotesMission}>Evaluate
-                            Mission</Button>
-                        <Button style={style.button} variant="contained" color="primary"
-                                onClick={this.rematch}>Rematch</Button>
+                        <Button variant="contained" color="primary" onClick={this.toggleDrawer(true)}>Action</Button>
                     </div>
                     <GameModal
                         id={this.state.open}
@@ -201,6 +246,14 @@ class PlayerActions extends React.Component {
                         classes={this.props.classes}
                     >
                     </GameModal>
+                    <SwipeableDrawer
+                        anchor="bottom"
+                        open={this.state.drawer}
+                        onClose={this.toggleDrawer(false)}
+                        onOpen={this.toggleDrawer(true)}
+                    >
+                        {this.actionsPanel()}
+                    </SwipeableDrawer>
                 </div>
             );
         }

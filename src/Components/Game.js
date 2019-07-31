@@ -1,17 +1,16 @@
 import React, {Component} from "react";
 import Grid from '@material-ui/core/Grid';
+import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container";
 import PlayerActions from "./PlayerActions";
 import Board from "./Board";
 import MissionPanel from "./MissionPanel";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
-import Box from "@material-ui/core/Box";
-import images from "res/images";
+import Players from "./Players";
 
 export default class Game extends Component {
 
     stateText = {
+        'init': 'New Game',
         'build_team': 'Build team',
         'voting': 'Voting phase',
         'eval_votes': 'Decision made',
@@ -20,6 +19,7 @@ export default class Game extends Component {
     };
 
     stateDescription = {
+        'init': 'Leader deals cards',
         'build_team': 'Leader selects mission assignees',
         'voting': 'Players vote to accept Assignees.',
         'eval_votes': 'Leader evaluates votes',
@@ -32,7 +32,8 @@ export default class Game extends Component {
         super(props);
         if (!props.gameRepository) throw new Error('Game not initialized');
         this.state = {
-            gameRepository: props.gameRepository
+            gameRepository: props.gameRepository,
+            drawer: false
         };
 
         props.gameRepository.eventHandlers = props.eventHandlers;
@@ -42,35 +43,13 @@ export default class Game extends Component {
         return this.state.gameRepository.game && this.state.gameRepository.game.game;
     }
 
-    renderPlayer = () => {
-        let isLeader = this.game.isLeader(this.props.player.id);
-        let playerImg = this.game.getImageForPlayer(this.props.player.id);
-        return (<Box display="flex" flexWrap="wrap" flexDirection="row">
-            <Box>
-                <img width={200} src={images[playerImg]} alt='Player Faction'></img>
-                <Typography>Player Faction</Typography>
-            </Box>
-            <Box style={{marginLeft: 10}}>
-                {isLeader && <img width={200} src={images.leader} alt='Leader'></img>}
-                {!isLeader && <Typography>{'Leader is '+this.game.leader}</Typography>}
-            </Box>
-        </Box>)
-    };
-
     render() {
         if (!this.game) {
             return (<div>{'Game Not started'}</div>);
         }
         return (
             <div>
-                <PlayerActions
-                    game={this.game}
-                    player={this.props.player}
-                    players={this.props.players}
-                />
-                <Grid item xs={12}>
-                    <Paper>{`Scores: ${JSON.stringify(this.game.players)}`}</Paper>
-                </Grid>
+
                 <Grid>
                     <Container style={{margin: 10}}>
                         <Typography display="inline" component="h1" variant="h2" align="center" color="textPrimary">
@@ -88,13 +67,17 @@ export default class Game extends Component {
                     <Grid item>
                         <MissionPanel game={this.game}></MissionPanel>
                     </Grid>
+                    <Grid item>
+                        <Players players={this.game.players} leader={this.game.leader}></Players>
+                    </Grid>
 
                 </Grid>
-                <Grid container spacing={0}>
-                    <Grid item style={{marginLeft: 30}}>
-                        {this.renderPlayer()}
-                    </Grid>
-                </Grid>
+                <PlayerActions
+                    game={this.game}
+                    player={this.props.player}
+                    players={this.props.players}
+                    drawer={this.state.drawer}
+                />
             </div>
         );
     }

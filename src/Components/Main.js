@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import GameMenu from './GameMenu'
 import Game from './Game'
 import GameDebug from './GameDebug'
-import GameRepository, {GAME_OBJ_TYPE} from "../Model/GameRepository";
+import GameRepository, {GAME_OBJ_TYPE} from "../Repositories/GameRepository";
 import BasicPrincipal from "../Model/BasicPrincipal";
 import {msg_for_error} from "../Model/ErrorCodes"
 import {withSnackbar} from 'notistack';
@@ -13,7 +13,6 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 
 class Main extends Component {
-
 
     eventHandlers = {
         'update': (gameWithEvents) => {
@@ -121,7 +120,7 @@ class Main extends Component {
             gameRepository: new GameRepository({
                 appId: process.env.APP_ID || 'resistance-server',
                 masterKey: process.env.MASTER_KEY || 'masterKey',
-                serverURL: process.env.SERVER_URL || 'http://localhost:5000/parse',
+                serverURL: process.env.REACT_APP_SERVER_URL || 'http://localhost:5000/parse',
                 classes: [{className: GAME_OBJ_TYPE}]
             }),
             eventCount: 0,
@@ -154,10 +153,6 @@ class Main extends Component {
         return this.state.gameRepository;
     }
 
-    index() {
-        return <h2>Home</h2>;
-    }
-
 
     createGame() {
         return (
@@ -169,7 +164,7 @@ class Main extends Component {
                     updatePlayersIds={this.updatePlayersIds}
                     enterGame={this.enterGame}
                     game={this.state}
-                ></GameMenu>
+                />
             </div>
         )
     }
@@ -182,7 +177,7 @@ class Main extends Component {
                       gameId={this.gameId}
                       player={this.principal}
                       players={this.playersIds}
-                ></Game>
+                />
             </div>
         )
     }
@@ -195,23 +190,10 @@ class Main extends Component {
                            gameId={this.gameId}
                            player={this.principal}
                            players={this.playersIds}
-                ></GameDebug>
+                />
             </div>
         )
     }
-
-
-    handleClick = () => {
-        this.setState({open: true});
-    };
-
-    handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        this.setState({open: false});
-    };
 
     handleChange = (event, newValue) => this.setState({tab: newValue});
 

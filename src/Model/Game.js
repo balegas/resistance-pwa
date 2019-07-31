@@ -3,7 +3,6 @@ import ResistanceRules from "./ResistanceRules";
 import EventEmitter from 'events';
 
 //Add preconditions for state transitions
-//trigger events as part of transitions
 const transitions = {
     init: [
         {transition: 'deal', to: 'build_team'}],
@@ -78,23 +77,19 @@ export default class Game {
     }
 
     get missions() {
-        return this.state.game.missions;
+        return this.game.missions;
     }
 
     get currentMission() {
-        return this.state.game.totalMissions;
+        return this.game.missions.length;
     }
 
     get countSuccess() {
-        return this.state.game.missions.reduce((success, m) => m.success ? success + 1 : success, 0)
+        return this.game.missions.reduce((success, m) => m.success ? success + 1 : success, 0)
     }
 
     get failedAttempts() {
         return this.round.failedAttempts;
-    }
-
-    get ui() {
-        return this.state.ui;
     }
 
     get rules() {
@@ -102,27 +97,27 @@ export default class Game {
     }
 
     get players() {
-        return this.state.game.players;
+        return this.game.players;
     }
 
     set players(players) {
-        this.state.game.players = players;
+        this.game.players = players;
     }
 
     get requiredAssignees() {
-        return this.state.rules.requiredAssignees(this.state.game.totalMissions);
+        return this.rules.requiredAssignees(this.currentMission);
     }
 
-    get leader(){
+    get leader() {
         return this.getPlayerByIdx(this.round.leader);
     }
 
     getPlayerByIdx(playerIdx) {
-        return this.game.players.map(p => p.id)[playerIdx];
+        return this.players.map(p => p.id)[playerIdx];
     }
 
     getPlayerIdxById(playerId) {
-        return this.game.players.findIndex(p => p.id === playerId);
+        return this.players.findIndex(p => p.id === playerId);
     }
 
     getImageForPlayer(playerId) {
@@ -132,7 +127,7 @@ export default class Game {
     }
 
     getRole(playerId) {
-        const idx = this.game.players.map(p => p.id).indexOf(playerId);
+        const idx = this.players.map(p => p.id).indexOf(playerId);
         const role = this.round.roles[idx];
         return role === ResistanceRules.AXIS ? 'Axis' : 'Ally';
     }
@@ -285,9 +280,8 @@ export default class Game {
     voteMaxFails() {
         let mutation = () => {
             this.round.success = false;
-            this.state.game.missions.push(this.round);
-            this.state.game.round = this.nextRound();
-            this.state.game.totalMissions++;
+            this.missions.push(this.round);
+            this.round = this.nextRound();
         };
         this.transition('vote_max_fails', () => mutation);
     }
@@ -337,18 +331,17 @@ export default class Game {
     }
 
     updateMissionStatus(success) {
-        this.state.game.round.success = success;
-        this.state.game.totalMissions++;
-        this.state.game.missions.push(this.state.game.round);
-        if (this.rules.isNextMission(this.state.game.missions)) {
-            this.transition("next_mission", () => this.nextMission(), [success, Object.values(this.state.game.round.mission)])
+        this.round.success = success;
+        this.missions.push(this.round);
+        if (this.rules.isNextMission(this.missions)) {
+            this.transition("next_mission", () => this.nextMission(), [success, Object.values(this.round.mission)])
         } else {
-            this.transition("finish", () => this.finish(), [this.rules.getWinners(this.state.game.missions, this.players), this.players]);
+            this.transition("finish", () => this.finish(), [this.rules.getWinners(this.missions, this.players), this.players]);
         }
     }
 
     nextMission() {
-        this.state.game.round = this.nextRound();
+        this.round = this.nextRound();
 
     }
 
@@ -368,7 +361,7 @@ export default class Game {
         if (!this.checkCurrentState('finish')) return;
         if (!this.isLeaderOrError(playerId)) return;
 
-        let rematch = () => this.state.game = this.newGame(this.players, this.rules);
+        let rematch = () => this.game = this.newGame(this.players, this.rules);
         this.transition('rematch', rematch);
     }
 
@@ -382,7 +375,6 @@ export default class Game {
     }
 
     nextRound() {
-        console.log("next round")
         return {
             leader: this.rules.setLeader(this.players.length, this.round.leader),
             roles: this.roles,
@@ -395,13 +387,12 @@ export default class Game {
     }
 
     roundFailed() {
-        this.state.game.round.failedAttempts++;
-        this.state.game.round.votes = {};
-        this.state.game.round.leader = this.rules.setLeader(this.players.length, this.round.leader);
+        this.round.failedAttempts++;
+        this.round.votes = {};
+        this.round.leader = this.rules.setLeader(this.players.length, this.round.leader);
     }
 
     newGame(players, rules) {
-        console.log("new game")
         return {
             players: players,
             totalMissions: 0,
@@ -420,7 +411,7 @@ export default class Game {
     }
 
     getState() {
-        return {game: this.state.game, rules: this.state.rules.className, players: this.state.players};
+        return {game: this.game, rules: this.rules.className, players: this.players};
     }
 
     static rulesClass = {
@@ -428,7 +419,7 @@ export default class Game {
     };
 
     static fromState({game, rules, players}, eventHandlers) {
-        let rulesObject = this.rulesClass[rules] && new this.rulesClass[rules](players);
+        let rulesObject = this.rulesClass[rules] && new this.rulesClass[rules](players.map(p => p.id));
         if (rulesObject) {
             let newGame = new Game(players, rulesObject, eventHandlers);
             newGame.players = players;
