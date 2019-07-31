@@ -1,5 +1,4 @@
-import ParseDriver from './Storage/ParseDriver';
-import GameRepository from './Model/GameState';
+import ParseDriver from '../../Storage/ParseDriver';
 
 it('ParseDriver: connect', async () => {
     let driver = new ParseDriver({
@@ -29,14 +28,17 @@ it('ParseDriver: save', async () => {
     await driver.save({key: 'key'}, 'GameState')
         .then((value) => driver.get(value.id, 'GameState'))
         .then((value) => driver.delete(value.objectId, 'GameState'))
-        .catch((Error) => {console.log(Error); expect(false)})
+        .catch((Error) => {
+            console.log(Error);
+            expect(false)
+        })
 });
 
 it('ParseDriver: update', async () => {
     let driver = new ParseDriver({
         appId: 'myAppId',
         masterKey: 'myMasterKey',
-        serverURL: 'http://localhost:1337/parse',
+        serverURL: 'http://localhost:5000/parse',
         classes: [{className: 'GameState'}]
     });
     driver.connect();
@@ -50,5 +52,8 @@ it('ParseDriver: update', async () => {
             return value.objectId
         })
         .then((id) => driver.delete(id, 'GameState'))
-        .catch((Error) => {console.log(Error); expect(false)})
+        .catch((Error) => {
+            console.log(Error);
+            expect(false)
+        })
 });
