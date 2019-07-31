@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+- stable
+cache:
+  directories:
+  - node_modules
+script:
+- npm test
+- npm run build
+deploy:
+  provider: heroku
+  api_key:
+    secure: YlpyWuuLTeiiCJJd7ekF1u/rKh+LTW158k2tbRbzIpnop6ux2212acDYc7+cJL1qMxqElzKWYQpqIXsoMhGiNcCYwSfF3fQbJGmqa1yWpL1XimeS+OQNbpYiJraVA8YsELtWFR0FarXkUX+pMGrJSCLk4jVrQMYRS0kgkHBBZ9eRmbqpwgv7bxaLYbgI3Mbc/slmUfhKBfuXXJCrQZlzVlpVIee46k1QpKAlCvN0ItxpOUN1n7VkYmekheATYHrKiA1hpTuUt6IvjU65N7rVMgzcAGXU4fJYUonfq0LZv+T5ZAQ8ZFV130Q5uQjpaxdNcrjgPqoVYM/Uh3STKU1iL/XKfdHqgEETubT7kSvkRw2X8V5hyrEwfRqESTkNrLNZav7QPcSez2Cnm5m7v3FxHEJnH6DepP1IprAER6xqUnf84xOQ+ojuAfTZT/zFRMRiR2reQ/XJ55qFh0P0UmvTh7VebaXic2vztvjy9Upn8SpWo5TpkiY4pIcEQ+ymEDVIPGAnA2lC/5pm9e/mlZROJZeAIY5f5Ak96JHzX2HgdFBl/pC7sXsvV7pPmz3ibTb4HeUx2JbFdEvxbzg3DV9vjmZ6cbWTJATx2cPpxC3BvH7+0jw1PcNbDcY7zOLV+BO9ZtzKbpIQo4KdiuWiQO6B8bGSDJP1BkD7rVLfTsLiuWM=
+  app: resistance-pwa
+  on:
+    repo: balegas/resistance-pwa
+true:
+  branch: master
