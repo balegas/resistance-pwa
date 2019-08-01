@@ -8,10 +8,13 @@ import {CardElement} from "../Elements/CardElements";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import FaceIcon from '@material-ui/icons/Face';
+// import ListItemIcon from "@material-ui/core/ListItemIcon";
+// import FaceIcon from '@material-ui/icons/Face';
 import ListItemText from "@material-ui/core/ListItemText";
 import Grid from '@material-ui/core/Grid';
+import ChatBubbleOutline from '@material-ui/icons/ChatBubbleOutline';
+import BottomNavigation from '@material-ui/core/BottomNavigation';
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 
 const style = {
 
@@ -30,7 +33,6 @@ const style = {
     modal: {
         backgroundColor: '#fff',
         borderRadius: 5,
-        width: 600,
         minHeight: 300,
         margin: '0 auto',
         padding: 30,
@@ -43,6 +45,7 @@ class PlayerActions extends React.Component {
         super(props);
         this.state = {
             isOpen: false,
+            bottomNav: 'action',
             assignees: [],
             drawer: false
         }
@@ -205,7 +208,7 @@ class PlayerActions extends React.Component {
                     <List>
                         {Object.values(this.actions).map((action, idx) => (
                             <ListItem button key={'action_' + idx} onClick={action.fun}>
-                                <ListItemIcon><FaceIcon/></ListItemIcon>
+                                {/*<ListItemIcon><FaceIcon/></ListItemIcon>*/}
                                 <ListItemText primary={action.text}/>
                             </ListItem>
                         ))}
@@ -222,7 +225,7 @@ class PlayerActions extends React.Component {
         let isLeader = this.props.game.isLeader(this.props.player.id);
         let playerImg = this.props.game.getImageForPlayer(this.props.player.id);
         return (
-            <Box  display="flex"  alignItems="center" p={1} m={1}>
+            <Box display="flex" alignItems="center" p={1} m={1}>
                 <Box p={1}>
                     <img height={'300'} src={images[playerImg]} alt='Player Faction'></img>
                 </Box>
@@ -235,10 +238,11 @@ class PlayerActions extends React.Component {
     render() {
         if (this.props.game) {
             return (
-                <div>
-                    <div>
-                        <Button variant="contained" color="primary" onClick={this.toggleDrawer(true)}>Action</Button>
-                    </div>
+                <Box m={0} p={0}>
+                    <BottomNavigation value={this.state.bottomNav}>
+                        <BottomNavigationAction onClick={this.toggleDrawer(true)} label="Action" value="action"
+                                                icon={<ChatBubbleOutline/>}/>
+                    </BottomNavigation>
                     <GameModal
                         id={this.state.open}
                         onClose={this.toggleModal}
@@ -254,7 +258,7 @@ class PlayerActions extends React.Component {
                     >
                         {this.actionsPanel()}
                     </SwipeableDrawer>
-                </div>
+                </Box>
             );
         }
         return (<div></div>);
@@ -279,11 +283,12 @@ class GameModal extends React.Component {
             return (<div></div>);
         }
         return (
-            <div className={classes.backdrop} onClick={this.props.onClose}>
-                <div className={classes.modal} onClick={(event) => event.stopPropagation()}>
+            <Box className={classes.backdrop} onClick={this.props.onClose}>
+                <Box minWidth={'300px'} maxWidth={'50%'} className={classes.modal}
+                     onClick={(event) => event.stopPropagation()}>
                     {action.content}
-                </div>
-            </div>
+                </Box>
+            </Box>
         );
     }
 }

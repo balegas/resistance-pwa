@@ -21,16 +21,16 @@ class MissionPanel extends Component {
             cards.push(CardElement(cardsArray[i]))
         }
         return (
-            <Box>
+            <Box display="flex" flexDirection="row">
                 {assigneesArray &&
-                <Box style={{minHeight: 300}}>
+                <Box  minWidth={300} width={'50%'}>
                     <Typography component="h1" variant="h2" align="center" color="textPrimary">Assignees</Typography>
                     <Box display="flex" flexWrap="wrap" flexDirection="row">
                         {assigneesCards}
                     </Box>
                 </Box>
                 }
-                <Box style={{minHeight: 300}}>
+                <Box  minWidth={300} width={'50%'}>
                     <Typography component="h1" variant="h2" align="center" color="textPrimary">Votes</Typography>
                     <Box display="flex" flexWrap="wrap" flexDirection="row">
                         {cards}
@@ -48,9 +48,7 @@ class MissionPanel extends Component {
     render() {
         return (
             <Container>
-                <Box display="flex" flexWrap="wrap" flexDirection="row" p={1}>
-                    {this.renderStage()}
-                </Box>
+                {this.renderStage()}
             </Container>
         )
 

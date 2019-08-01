@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import images from "res/images";
 import {withStyles} from '@material-ui/styles';
-import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
 
 const style = {
 
@@ -15,36 +15,33 @@ const style = {
 
         marker: {
             position: 'absolute',
-            width: '10%',
+            width: '13%',
         },
 
         marker0: {
-            top: '44%',
-            left: '9.5%'
+            top: '41%',
+            left: '5%'
         },
 
         marker1: {
-            top: '7.5%',
-            left: '17%',
+            top: '6%',
+            left: '13%',
         },
 
         marker2: {
-            top: '20%',
-            left: '50.5%'
+            top: '19%',
+            left: '49%'
         },
 
         marker3: {
-            top: '65.5%',
-            left: '37.5%'
+            top: '65%',
+            left: '35%'
         },
 
         marker4: {
-            top: 292,
-            left:
-                1117
+            top: '30%',
+            left: '81%'
         }
-        ,
-
     }
 ;
 
@@ -65,14 +62,14 @@ class Board extends Component {
         };
 
         return (
-            <Container fixed className={classes.board} maxWidth="md">
+            <Box className={classes.board} maxWidth="100%" minWidth={600}>
                 <img alt="Game Board" src={images.game_board} style={style.responsiveImg}></img>
                 {markers.reduce(printMarkers, [])}
-            </Container>
+            </Box>
         );
     }
 
-};
+}
 
 export default withStyles(style)(Board);
 

@@ -1,11 +1,12 @@
 import React, {Component} from "react";
 import Grid from '@material-ui/core/Grid';
 import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
+import Box from "@material-ui/core/Box";
 import PlayerActions from "./PlayerActions";
 import Board from "./Board";
 import MissionPanel from "./MissionPanel";
 import Players from "./Players";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 
 export default class Game extends Component {
 
@@ -33,7 +34,7 @@ export default class Game extends Component {
         if (!props.gameRepository) throw new Error('Game not initialized');
         this.state = {
             gameRepository: props.gameRepository,
-            drawer: false
+            drawer: false,
         };
 
         props.gameRepository.eventHandlers = props.eventHandlers;
@@ -48,29 +49,26 @@ export default class Game extends Component {
             return (<div>{'Game Not started'}</div>);
         }
         return (
-            <div>
-
+            <Box>
                 <Grid>
-                    <Container style={{margin: 10}}>
-                        <Typography display="inline" component="h1" variant="h2" align="center" color="textPrimary">
+                    <Grid item style={{padding: 10}}>
+                        <Typography align="center" component="h1" variant="h2" color="textPrimary">
                             {this.stateText[this.game.currentState]}
                         </Typography>
-                        <Typography display="inline" component="span" align="justify" color="textPrimary">
+                        <Typography align="center" component="h5" color="textPrimary">
                             {" " + this.stateDescription[this.game.currentState]}
                         </Typography>
-                    </Container>
+                    </Grid>
                 </Grid>
-                <Grid container spacing={0} justify="flex-start">
+                <Grid container xs={12}>
                     <Grid item>
                         <Board missions={this.game.missions}></Board>
                     </Grid>
-                    <Grid item>
+                </Grid>
+                <Grid container>
+                    <Grid item xs={12}>
                         <MissionPanel game={this.game}></MissionPanel>
                     </Grid>
-                    <Grid item>
-                        <Players players={this.game.players} leader={this.game.leader}></Players>
-                    </Grid>
-
                 </Grid>
                 <PlayerActions
                     game={this.game}
@@ -78,7 +76,12 @@ export default class Game extends Component {
                     players={this.props.players}
                     drawer={this.state.drawer}
                 />
-            </div>
+                <SwipeableDrawer anchor="right" open={this.props.playersDrawer}
+                                 onClose={this.props.togglePlayersDrawer(false)}>
+                    <Players players={this.game.players} leader={this.game.leader}></Players>
+                </SwipeableDrawer>
+            </Box>
+
         );
     }
 }

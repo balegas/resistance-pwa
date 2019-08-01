@@ -10,7 +10,21 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import {ThemeProvider} from '@material-ui/styles';
+import {createMuiTheme} from '@material-ui/core/styles';
+import indigo from '@material-ui/core/colors/indigo';
+import Players from "./Players";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+
+
+const theme = createMuiTheme({
+    palette: {
+        primary: indigo,
+        background: {}
+    }
+});
 
 class Main extends Component {
 
@@ -170,6 +184,7 @@ class Main extends Component {
     }
 
     gamePanel() {
+        console.log("main drawer",this.state.playersDrawer)
         return (
             <div>
                 <Game gameRepository={this.state.gameRepository}
@@ -177,6 +192,8 @@ class Main extends Component {
                       gameId={this.gameId}
                       player={this.principal}
                       players={this.playersIds}
+                      playersDrawer={this.state.playersDrawer}
+                      togglePlayersDrawer={this.togglePlayersDrawer}
                 />
             </div>
         )
@@ -202,6 +219,13 @@ class Main extends Component {
         'aria-controls': `simple-tabpanel-${index}`,
     });
 
+    togglePlayersDrawer = (open) => event => {
+        if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        this.setState({playersDrawer: open});
+    };
+
     TabPanel(props) {
         const {children, value, index, ...other} = props;
 
@@ -221,13 +245,14 @@ class Main extends Component {
 
     render() {
         return (
-            <div>
+            <ThemeProvider theme={theme}>
                 <AppBar position="static">
                     <Tabs value={this.state.tab} onChange={this.handleChange} aria-label="simple tabs example">
                         <Tab label="Enter Game" {...this.a11yProps(0)} />
                         <Tab label="Game" {...this.a11yProps(1)} />
                         <Tab label="Debug" {...this.a11yProps(2)} />
                         <Tab label="Instructions (coming soon)" {...this.a11yProps(2)} />
+                        <Button color="secondary" onClick={this.togglePlayersDrawer(true)}>Scores</Button>
                     </Tabs>
                 </AppBar>
                 <this.TabPanel value={this.state.tab} index={0}>
@@ -239,7 +264,7 @@ class Main extends Component {
                 <this.TabPanel value={this.state.tab} index={2}>
                     {this.debugPanel()}
                 </this.TabPanel>
-            </div>
+            </ThemeProvider>
         )
     }
 }
