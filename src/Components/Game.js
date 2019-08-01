@@ -51,7 +51,7 @@ export default class Game extends Component {
         return (
             <Box>
                 <Grid>
-                    <Grid item style={{padding: 10}}>
+                    <Grid item>
                         <Typography align="center" component="h1" variant="h2" color="textPrimary">
                             {this.stateText[this.game.currentState]}
                         </Typography>
@@ -60,7 +60,7 @@ export default class Game extends Component {
                         </Typography>
                     </Grid>
                 </Grid>
-                <Grid container xs={12}>
+                <Grid container>
                     <Grid item>
                         <Board missions={this.game.missions}></Board>
                     </Grid>

@@ -108,11 +108,13 @@ class Main extends Component {
 
     updateEventCount = eventCount => this.setState({eventCount});
 
-    enterGame = () => {
+    enterGame = (game) => {
+        const selectedId = game || this.gameId;
+        console.log("selected id", selectedId)
         const principal = new BasicPrincipal(this.playerId, this.playerId);
-        if (principal && this.gameId) {
+        if (principal && selectedId) {
             this.setState({principal});
-            this.repository.getOrCreateGame(principal, this.gameId, this.playersIds)
+            this.repository.getOrCreateGame(principal, selectedId, this.playersIds)
                 .then(({gameId, eventCount}) => {
                     this.updateGameId(gameId);
                     this.updateEventCount(eventCount);
@@ -142,6 +144,7 @@ class Main extends Component {
             open: true,
             tab: 0
         };
+        this.repository.list(GAME_OBJ_TYPE).then(games => this.setState({games}));
     }
 
     get gameId() {
@@ -181,7 +184,6 @@ class Main extends Component {
     }
 
     gamePanel() {
-        console.log("main drawer",this.state.playersDrawer)
         return (
             <div>
                 <Game gameRepository={this.state.gameRepository}
@@ -243,7 +245,7 @@ class Main extends Component {
     render() {
         return (
             <ThemeProvider theme={theme}>
-                <AppBar position="static">
+                <AppBar position="static" style={{minWidth: 600}}>
                     <Tabs value={this.state.tab} onChange={this.handleChange} aria-label="simple tabs example">
                         <Tab label="Enter Game" {...this.a11yProps(0)} />
                         <Tab label="Game" {...this.a11yProps(1)} />

@@ -61,6 +61,15 @@ export default class ParseDriver {
             .catch(error => Promise.reject(error))
     }
 
+
+    //TODO: hacky list method
+    list(type, limit = 10) {
+        const query = new Parse.Query(type);
+        query.limit(limit);
+        return query.find()
+            .then(res => res.map(r => this.object_to_json(r)))
+    }
+
     delete(key, type) {
         return this.getInternal(key, type)
             .then(value =>
@@ -68,7 +77,7 @@ export default class ParseDriver {
                     .then(() => true)
                     .catch(error => Promise.reject(new DBError(error))))
             .catch(error => Promise.reject(error))
-    };
+    }
 
     getInternal(key, type) {
         let idx = this.classes.findIndex(elem => elem.className === type);

@@ -100,4 +100,8 @@ export default class GameRepository {
 
     }
 
+    list(type) {
+        return this.repository.list(type);
+    }
+
 }

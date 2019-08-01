@@ -59,6 +59,10 @@ export default class BaseRepository {
         }
         return this.driver.subscribe(key, type, handlers);
     }
+
+    list(type){
+        return this.driver.list(type);
+    }
 }
 
 export class DBError {

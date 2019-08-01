@@ -1,6 +1,9 @@
 import React from 'react'
 import ReactListInput from 'react-list-input';
 import Button from '@material-ui/core/Button';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import List from '@material-ui/core/List';
 
 const Input = ({value, onChange, type = 'text'}) =>
     <input type={type} value={value} onChange={e => onChange(e.target.value)}/>;
@@ -55,6 +58,12 @@ export default class GameMenu extends React.Component {
         )
     }
 
+    openGames = (games) => games.map(g =>
+        <ListItem button key={g.objectId} onClick={() => this.props.enterGame(g.objectId)}>
+            <ListItemText>{g.objectId}</ListItemText>
+        </ListItem>);
+
+
     render() {
         return (
             <div>
@@ -72,9 +81,15 @@ export default class GameMenu extends React.Component {
                     <Input value={this.props.game.gameId} onChange={this.props.updateGameId}/>
                     <Input value={this.props.game.playerId} onChange={this.props.updatePlayerId}/>
                 </div>
-                <Button variant="contained" style={style.root} onClick={this.props.enterGame}>
+                <Button variant="contained" style={style.root} onClick={() => this.props.enterGame()}>
                     Enter Game
                 </Button>
+
+                <List height={400} width={360}>
+                    {this.props.game.games && this.openGames(this.props.game.games)}
+                </List>
+
+
             </div>
         )
     }
