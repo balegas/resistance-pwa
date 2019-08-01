@@ -15,9 +15,6 @@ import Typography from '@material-ui/core/Typography';
 import {ThemeProvider} from '@material-ui/styles';
 import {createMuiTheme} from '@material-ui/core/styles';
 import indigo from '@material-ui/core/colors/indigo';
-import Players from "./Players";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-
 
 const theme = createMuiTheme({
     palette: {
