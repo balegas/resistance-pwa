@@ -48,6 +48,10 @@ export default class Game {
         return this.state.game.round;
     }
 
+    set round(round) {
+        return this.state.game.round = round;
+    }
+
     get game() {
         return this.state.game;
     }
@@ -292,13 +296,13 @@ export default class Game {
         console.log("[tryVoteMission]", playerId, vote);
         if (!this.checkCurrentState('mission')) return;
 
-        let {success, code, details} = this.rules.validateVoteMission(playerId, vote, this.mission);
+        let {success, code, details} = this.rules.validateVoteMission(playerId, this.round.assignees, this.currentMission, vote, this.mission,);
         if (!success) {
             this.triggerEvent('error', [code, details]);
             return;
         }
         this.voteMission(playerId, vote);
-        if (this.rules.isVotesMissionReady(this.mission)) {
+        if (this.rules.isVotesMissionReady(this.mission, this.currentMission)) {
             this.allVotesMission();
         }
         console.log("[tryVoteMission]", "success");
@@ -320,7 +324,7 @@ export default class Game {
         if (!this.checkCurrentState('eval_mission')) return;
         if (!this.isLeaderOrError(playerId)) return;
 
-        let result = this.rules.evalVotesMission(Object.values(this.round.mission));
+        let result = this.rules.evalVotesMission(Object.values(this.round.mission), this.currentMission);
         if (-1 > result > 1) {
             this.triggerEvent('error', ['error evaluating votes', result]);
             return;

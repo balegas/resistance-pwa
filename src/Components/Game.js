@@ -49,14 +49,28 @@ export default class Game extends Component {
             return (<div>{'Game Not started'}</div>);
         }
         return (
-            <Box>
+            <Box style={{background: '#000000'}}>
+                <PlayerActions
+                    game={this.game}
+                    player={this.props.player}
+                    players={this.props.players}
+                    drawer={this.state.drawer}
+                />
+                <Grid container>
+                    <Grid item xs={12}>
+                        <MissionPanel game={this.game}></MissionPanel>
+                    </Grid>
+                </Grid>
                 <Grid>
                     <Grid item>
-                        <Typography align="center" component="h1" variant="h2" color="textPrimary">
+                        <Typography style={{color: 'white'}}  align="center" component="h1" variant="h2" color="textSecondary">
                             {this.stateText[this.game.currentState]}
                         </Typography>
-                        <Typography align="center" component="h5" color="textPrimary">
+                        <Typography style={{color: 'white'}}  align="center" component="h5" color="textSecondary">
                             {" " + this.stateDescription[this.game.currentState]}
+                        </Typography>
+                        <Typography style={{color: 'white'}}  align="center" component="h5" color="textSecondary">
+                            {"Round Leader: " + this.game.leader}
                         </Typography>
                     </Grid>
                 </Grid>
@@ -65,17 +79,6 @@ export default class Game extends Component {
                         <Board missions={this.game.missions}></Board>
                     </Grid>
                 </Grid>
-                <Grid container>
-                    <Grid item xs={12}>
-                        <MissionPanel game={this.game}></MissionPanel>
-                    </Grid>
-                </Grid>
-                <PlayerActions
-                    game={this.game}
-                    player={this.props.player}
-                    players={this.props.players}
-                    drawer={this.state.drawer}
-                />
                 <SwipeableDrawer anchor="right" open={this.props.playersDrawer}
                                  onClose={this.props.togglePlayersDrawer(false)}>
                     <Players players={this.game.players} leader={this.game.leader}></Players>

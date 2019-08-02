@@ -1,6 +1,6 @@
 const images = {
     current: require('./images/current.png'),
-    game_board: require('./images/game_board.png'),
+    game_board: require('./images/game_board.jpg'),
     allies: require('./images/marker_allies.png'),
     axis: require('./images/marker_axis.png'),
     ally0: require('./images/ally-1-en.jpg'),

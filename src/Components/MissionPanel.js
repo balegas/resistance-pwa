@@ -23,15 +23,16 @@ class MissionPanel extends Component {
         return (
             <Box display="flex" flexDirection="row">
                 {assigneesArray &&
-                <Box  minWidth={300} width={'50%'}>
-                    <Typography component="h1" variant="h2" align="center" color="textPrimary">Assignees</Typography>
+                <Box minWidth={150} width={'50%'}>
+                    <Typography style={{color: 'white'}} component="h1" variant="h2" align="center"
+                                color="textSecondary">Assignees</Typography>
                     <Box display="flex" flexWrap="wrap" flexDirection="row">
                         {assigneesCards}
                     </Box>
                 </Box>
                 }
-                <Box  minWidth={300} width={'50%'}>
-                    <Typography component="h1" variant="h2" align="center" color="textPrimary">Votes</Typography>
+                <Box minWidth={150} width={'50%'}>
+                    <Typography style={{color: 'white'}} component="h1" variant="h2" align="center" color="textSecondary">Votes</Typography>
                     <Box display="flex" flexWrap="wrap" flexDirection="row">
                         {cards}
                     </Box>
@@ -52,8 +53,7 @@ class MissionPanel extends Component {
             </Container>
         )
 
-    }
-    ;
+    };
 }
 
 export default MissionPanel;

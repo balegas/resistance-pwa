@@ -64,17 +64,19 @@ export default class ResistanceRules {
         }
     }
 
-    validateVoteMission(playerId, vote, votes) {
+    validateVoteMission(playerId, assignees, numRound, vote, votes) {
         let isPlayer = this.isPlayer(playerId);
+        let isAssignee = assignees.includes(playerId);
         let voted = votes[playerId];
         let booleanVote = vote === true || vote === false;
-        if (!isPlayer) {
+        if (!isPlayer || !isAssignee) {
             return {success: false, code: ERROR_INVALID_PLAYER, details: playerId};
         } else if (voted) {
             return {success: false, code: ERROR_PLAYER_ALREADY_VOTED, details: playerId};
         } else if (!booleanVote) {
             return {success: false, code: INVALID_OPERATION};
-        } else {
+        }
+        else {
             return {success: true}
         }
     }
@@ -90,8 +92,8 @@ export default class ResistanceRules {
         return 1;
     }
 
-    evalVotesMission(votes, failedAttempts) {
-        if(votes.length < this.players.length){
+    evalVotesMission(votes, failedAttempts, numRound) {
+        if(votes.length < this.playersPerRound[numRound]){
             return -1;
         }
         return votes.some((vote) => !vote) ? 0 : 1;
@@ -101,8 +103,8 @@ export default class ResistanceRules {
         return Object.keys(votes).length === this.players.length;
     }
 
-    isVotesMissionReady(votes) {
-        return Object.keys(votes).length === this.players.length;
+    isVotesMissionReady(votes, numRound) {
+        return Object.keys(votes).length === this.playersPerRound[numRound];
     }
 
     isPlayer(playerId) {

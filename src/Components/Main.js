@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import GameMenu from './GameMenu'
 import Game from './Game'
-import GameDebug from './GameDebug'
+// import GameDebug from './GameDebug'
 import GameRepository, {GAME_OBJ_TYPE} from "../Repositories/GameRepository";
 import BasicPrincipal from "../Model/BasicPrincipal";
 import {msg_for_error} from "../Model/ErrorCodes"
@@ -19,7 +19,10 @@ import indigo from '@material-ui/core/colors/indigo';
 const theme = createMuiTheme({
     palette: {
         primary: indigo,
-        background: {}
+        background: {},
+        text:{
+            secondary: 'rgba(255, 255, 255, 0.8)'
+        }
     }
 });
 
@@ -170,7 +173,7 @@ class Main extends Component {
 
     createGame() {
         return (
-            <div>
+            <div style={{padding: 30}}>
                 <h2>Enter Game</h2>
                 <GameMenu
                     updateGameId={this.updateGameId}
@@ -198,18 +201,18 @@ class Main extends Component {
         )
     }
 
-    debugPanel() {
-        return (
-            <div>
-                <GameDebug gameRepository={this.state.gameRepository}
-                           eventHandlers={this.eventHandlers}
-                           gameId={this.gameId}
-                           player={this.principal}
-                           players={this.playersIds}
-                />
-            </div>
-        )
-    }
+    // debugPanel() {
+    //     return (
+    //         <div>
+    //             <GameDebug gameRepository={this.state.gameRepository}
+    //                        eventHandlers={this.eventHandlers}
+    //                        gameId={this.gameId}
+    //                        player={this.principal}
+    //                        players={this.playersIds}
+    //             />
+    //         </div>
+    //     )
+    // }
 
     handleChange = (event, newValue) => this.setState({tab: newValue});
 
@@ -237,20 +240,21 @@ class Main extends Component {
                 aria-labelledby={`simple-tab-${index}`}
                 {...other}
             >
-                <Box p={3}>{children}</Box>
+                <Box>{children}</Box>
             </Typography>
         );
     }
 
     render() {
+        console.log(theme)
         return (
             <ThemeProvider theme={theme}>
                 <AppBar position="static" style={{minWidth: 600}}>
                     <Tabs value={this.state.tab} onChange={this.handleChange} aria-label="simple tabs example">
                         <Tab label="Enter Game" {...this.a11yProps(0)} />
                         <Tab label="Game" {...this.a11yProps(1)} />
-                        <Tab label="Debug" {...this.a11yProps(2)} />
-                        <Tab label="Instructions (coming soon)" {...this.a11yProps(2)} />
+                        {/*<Tab label="Debug" {...this.a11yProps(2)} />*/}
+                        {/*<Tab label="Instructions (coming soon)" {...this.a11yProps(2)} />*/}
                         <Button color="secondary" onClick={this.togglePlayersDrawer(true)}>Scores</Button>
                     </Tabs>
                 </AppBar>
@@ -260,9 +264,9 @@ class Main extends Component {
                 <this.TabPanel value={this.state.tab} index={1}>
                     {this.gamePanel()}
                 </this.TabPanel>
-                <this.TabPanel value={this.state.tab} index={2}>
-                    {this.debugPanel()}
-                </this.TabPanel>
+                {/*<this.TabPanel value={this.state.tab} index={2}>*/}
+                {/*    {this.debugPanel()}*/}
+                {/*</this.TabPanel>*/}
             </ThemeProvider>
         )
     }

@@ -62,7 +62,7 @@ class Board extends Component {
         };
 
         return (
-            <Box className={classes.board} maxWidth="100%" minWidth={600}>
+            <Box className={classes.board} maxWidth="100%" minWidth={350}>
                 <img alt="Game Board" src={images.game_board} style={style.responsiveImg}></img>
                 {markers.reduce(printMarkers, [])}
             </Box>
