@@ -9,7 +9,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "knuth-shuffle-seeded": "^1.0.6",
-    "parse-server": "^3.6.0"
+    "parse-server": "^4.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
